@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Concentrate</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #F9F6F1;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+:root {
+  --forest:   #1B3A2F;
+  --forest-mid: #2D5A3D;
+  --forest-light: #4A7C5C;
+  --cream:    #F9F6F1;
+  --warm-white: #FDF8F0;
+  --sage:     #A8C5A0;
+  --dusty-pink: #E8C4B8;
+  --lavender: #C4B8D8;
+  --text-dark: #1a1a1a;
+  --text-mid:  #4a4a4a;
+  --text-light: #888;
+  --radius:   14px;
+  --shadow:   0 4px 24px rgba(27,58,47,0.10);
+  --shadow-hover: 0 8px 32px rgba(27,58,47,0.18);
+}
+
+.widget {
+  width: 100%;
+  max-width: 540px;
+  padding: 20px 16px 28px;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.header-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--forest-mid);
+  background: rgba(45,90,61,0.10);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.header h2 {
+  font-size: clamp(20px, 5vw, 26px);
+  font-weight: 800;
+  color: var(--forest);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.header p {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.5;
+}
+
+/* PROGRESS BAR */
+.progress-wrap {
+  margin-bottom: 20px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.progress-track {
+  height: 4px;
+  background: rgba(27,58,47,0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--forest-mid);
+  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* QUESTION CARD */
+.question-card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 22px 20px 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  animation: fadeSlide 0.3s ease both;
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.question-number {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--forest-light);
+  margin-bottom: 8px;
+}
+
+.question-text {
+  font-size: clamp(15px, 4vw, 17px);
+  font-weight: 700;
+  color: var(--forest);
+  line-height: 1.35;
+  margin-bottom: 16px;
+}
+
+/* ANSWER BUTTONS */
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.answer-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 2px solid rgba(27,58,47,0.13);
+  border-radius: 10px;
+  background: var(--warm-white);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.answer-btn:hover {
+  border-color: var(--forest-mid);
+  background: #fff;
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.answer-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.answer-btn.selected {
+  border-color: var(--forest);
+  background: rgba(27,58,47,0.06);
+}
+
+.answer-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(27,58,47,0.25);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+}
+
+.answer-btn.selected .answer-dot {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+.answer-dot-inner {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.answer-btn.selected .answer-dot-inner {
+  opacity: 1;
+}
+
+.answer-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.3;
+}
+
+.answer-sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-light);
+  margin-top: 1px;
+}
+
+/* NEXT BUTTON */
+.next-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--forest);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+  margin-top: 4px;
+}
+
+.next-btn.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.next-btn:hover {
+  background: var(--forest-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(27,58,47,0.25);
+}
+
+.next-btn:active {
+  transform: translateY(0);
+}
+
+/* RESULT CARD */
+.result-card {
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  animation: fadeSlide 0.4s ease both;
+  display: none;
+}
+
+.result-card.show {
+  display: block;
+}
+
+.result-banner {
+  padding: 24px 22px 20px;
+}
+
+.result-banner.hash-banner {
+  background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%);
+}
+
+.result-banner.rosin-banner {
+  background: linear-gradient(135deg, #2C4A5E 0%, #3D6478 100%);
+}
+
+.result-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 8px;
+}
+
+.result-title {
+  font-size: clamp(22px, 6vw, 28px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.result-subtitle {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+}
+
+.result-body {
+  padding: 20px 22px;
+}
+
+.result-reasons {
+  list-style: none;
+  margin-bottom: 18px;
+}
+
+.result-reasons li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--text-dark);
+  line-height: 1.45;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(27,58,47,0.07);
+}
+
+.result-reasons li:last-child {
+  border-bottom: none;
+}
+
+.check-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.check-icon svg {
+  width: 10px;
+  height: 10px;
+}
+
+.result-cta {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background: var(--forest);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+.result-cta:hover {
+  background: var(--forest-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(27,58,47,0.25);
+}
+
+.result-cta.secondary {
+  background: transparent;
+  color: var(--forest);
+  border: 2px solid rgba(27,58,47,0.2);
+  margin-top: 8px;
+}
+
+.result-cta.secondary:hover {
+  border-color: var(--forest);
+  background: rgba(27,58,47,0.04);
+  box-shadow: none;
+}
+
+.restart-link {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-light);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  width: 100%;
+}
+
+.restart-link:hover {
+  color: var(--text-mid);
+}
+</style>
+</head>
+<body>
+
+<div class="widget">
+
+  <div class="header">
+    <span class="header-eyebrow">2 minute quiz</span>
+    <h2>Hash or rosin — which one fits you?</h2>
+    <p>Answer three questions. Get a straight answer.</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-text">Question 1 of 3</span>
+        <span id="progress-pct">33%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width: 33%"></div>
+      </div>
+    </div>
+
+    <div class="question-card" id="question-card">
+      <div class="question-number" id="q-number">Question 1</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="answers" id="answers-wrap"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn">Continue</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-card" id="result-card">
+    <div class="result-banner" id="result-banner">
+      <div class="result-tag" id="result-tag"></div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-subtitle" id="result-subtitle"></div>
+    </div>
+    <div class="result-body">
+      <ul class="result-reasons" id="result-reasons"></ul>
+      <a href="#" class="result-cta" id="result-cta-primary" target="_blank" rel="noopener"></a>
+      <a href="#" class="result-cta secondary" id="result-cta-secondary" target="_blank" rel="noopener"></a>
+    </div>
+    <button class="restart-link" id="restart-btn">Start over</button>
+  </div>
+
+</div>
+
+<script>
+  var questions = [
+    {
+      text: "What does your current setup look like?",
+      answers: [
+        { label: "I smoke joints or pack bowls", sub: "Flower is my go-to", value: "hash" },
+        { label: "I already own a dab rig or e-rig", sub: "I'm set up for concentrates", value: "rosin" },
+        { label: "I'm new to concentrates entirely", sub: "Starting from scratch", value: "hash" }
+      ]
+    },
+    {
+      text: "What matters most to you in a session?",
+      answers: [
+        { label: "A relaxed, well-rounded experience", sub: "Slow build, longer lasting", value: "hash" },
+        { label: "Maximum potency and terpene flavor", sub: "Dialing in the full profile", value: "rosin" },
+        { label: "Keeping it simple and affordable", sub: "No gear, no fuss", value: "hash" }
+      ]
+    },
+    {
+      text: "How do you feel about the price difference?",
+      answers: [
+        { label: "I want strong quality at a fair price", sub: "Happy around $8–$40 per 1g", value: "hash" },
+        { label: "I'll pay a premium for the best available", sub: "Worth $50–$100+ per 1g to me", value: "rosin" },
+        { label: "Still figuring out what I like", sub: "Not ready to overspend yet", value: "hash" }
+      ]
+    }
+  ];
+
+  var results = {
+    hash: {
+      bannerClass: "hash-banner",
+      tag: "Your match",
+      title: "Hash is your concentrate.",
+      subtitle: "Versatile, potent, and no new gear required. A natural fit for where you are.",
+      reasons: [
+        "Works in joints, bowls, and bongs — no extra equipment",
+        "30–60% THCa potency: serious, not overwhelming",
+        "Strong value at $8–$40 per 1g across the spectrum",
+        "Great starting point before committing to a dab rig"
+      ],
+      ctaPrimaryText: "Explore Classic Hash",
+      ctaPrimaryHref: "https://mood.com/product/classic-hash?bcc=concentrates",
+      ctaSecondaryText: "Browse all concentrates",
+      ctaSecondaryHref: "https://mood.com/shop/product-category/concentrates"
+    },
+    rosin: {
+      bannerClass: "rosin-banner",
+      tag: "Your match",
+      title: "Rosin is your concentrate.",
+      subtitle: "You've got the setup and the standard. Rosin is built for exactly that.",
+      reasons: [
+        "60–90% THC from hash rosin — the highest-purity solventless option",
+        "Terpene profiles that taste closer to fresh flower than anything else",
+        "Cured or live: each has a distinct flavor and character worth exploring",
+        "Best experienced through a dab rig or e-rig at low temperatures"
+      ],
+      ctaPrimaryText: "What is hash rosin?",
+      ctaPrimaryHref: "https://mood.com/blog/what-is-hash-rosin",
+      ctaSecondaryText: "Hash rosin vs. flower rosin",
+      ctaSecondaryHref: "https://mood.com/blog/hash-rosin-vs-flower-rosin-thc"
+    }
+  };
+
+  var currentQuestion = 0;
+  var votes = { hash: 0, rosin: 0 };
+  var selectedAnswer = null;
+
+  function renderQuestion() {
+    var q = questions[currentQuestion];
+    var pct = Math.round(((currentQuestion + 1) / questions.length) * 100);
+
+    document.getElementById("progress-text").textContent = "Question " + (currentQuestion + 1) + " of " + questions.length;
+    document.getElementById("progress-pct").textContent = pct + "%";
+    document.getElementById("progress-fill").style.width = pct + "%";
+    document.getElementById("q-number").textContent = "Question " + (currentQuestion + 1);
+    document.getElementById("q-text").textContent = q.text;
+
+    var wrap = document.getElementById("answers-wrap");
+    wrap.innerHTML = "";
+
+    q.answers.forEach(function(a, i) {
+      var btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.dataset.value = a.value;
+      btn.dataset.index = i;
+      btn.innerHTML =
+        '<span class="answer-dot"><span class="answer-dot-inner"></span></span>' +
+        '<span>' +
+          '<span class="answer-text">' + a.label + '</span>' +
+          (a.sub ? '<br><span class="answer-sub">' + a.sub + '</span>' : '') +
+        '</span>';
+      btn.addEventListener("click", function() { selectAnswer(this); });
+      wrap.appendChild(btn);
+    });
+
+    // Animate card
+    var card = document.getElementById("question-card");
+    card.style.animation = "none";
+    void card.offsetWidth;
+    card.style.animation = "fadeSlide 0.3s ease both";
+
+    selectedAnswer = null;
+    var nextBtn = document.getElementById("next-btn");
+    nextBtn.classList.remove("visible");
+    nextBtn.textContent = currentQuestion < questions.length - 1 ? "Continue" : "See my result";
+  }
+
+  function selectAnswer(btn) {
+    document.querySelectorAll(".answer-btn").forEach(function(b) {
+      b.classList.remove("selected");
+    });
+    btn.classList.add("selected");
+    selectedAnswer = btn.dataset.value;
+    document.getElementById("next-btn").classList.add("visible");
+  }
+
+  function advance() {
+    if (!selectedAnswer) return;
+    votes[selectedAnswer]++;
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    var winner = votes.rosin > votes.hash ? "rosin" : "hash";
+    var r = results[winner];
+
+    document.getElementById("quiz").style.display = "none";
+
+    var card = document.getElementById("result-card");
+    card.classList.add("show");
+
+    document.getElementById("result-banner").className = "result-banner " + r.bannerClass;
+    document.getElementById("result-tag").textContent = r.tag;
+    document.getElementById("result-title").textContent = r.title;
+    document.getElementById("result-subtitle").textContent = r.subtitle;
+
+    var ul = document.getElementById("result-reasons");
+    ul.innerHTML = "";
+    r.reasons.forEach(function(reason) {
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<span class="check-icon"><svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 5.5L4 7.5L8 3" stroke="#1B3A2F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+        '<span>' + reason + '</span>';
+      ul.appendChild(li);
+    });
+
+    var primary = document.getElementById("result-cta-primary");
+    primary.textContent = r.ctaPrimaryText;
+    primary.href = r.ctaPrimaryHref;
+
+    var secondary = document.getElementById("result-cta-secondary");
+    secondary.textContent = r.ctaSecondaryText;
+    secondary.href = r.ctaSecondaryHref;
+  }
+
+  function restart() {
+    currentQuestion = 0;
+    votes = { hash: 0, rosin: 0 };
+    selectedAnswer = null;
+
+    document.getElementById("result-card").classList.remove("show");
+    document.getElementById("quiz").style.display = "block";
+    renderQuestion();
+  }
+
+  document.getElementById("next-btn").addEventListener("click", advance);
+  document.getElementById("restart-btn").addEventListener("click", restart);
+
+  renderQuestion();
+</script>
+
+</body>
+</html>
